@@ -44,6 +44,9 @@ An MCP (Model Context Protocol) server for interacting with [CiviCRM](https://ci
 - `civicrm_get_cases` — Search case records
 - `civicrm_create_case` — Create a new case
 
+### Site Management
+- `civicrm_use_site` — Select which CiviCRM site to query, or list available sites
+
 ### Generic / Discovery
 - `civicrm_api` — Execute any APIv4 call directly (for entities/actions not covered above)
 - `civicrm_get_entity_fields` — List all fields available for any entity
@@ -53,12 +56,30 @@ An MCP (Model Context Protocol) server for interacting with [CiviCRM](https://ci
 
 ### Environment Variables
 
+#### Multi-site (recommended)
+
+Configure any number of CiviCRM instances using slug-based env var pairs:
+
+| Variable | Description |
+|---|---|
+| `CIVICRM_SITE_<SLUG>_URL` | Base URL for the site (e.g. `CIVICRM_SITE_WESSEX_URL`) |
+| `CIVICRM_SITE_<SLUG>_KEY` | API key for the site (e.g. `CIVICRM_SITE_WESSEX_KEY`) |
+
+The `<SLUG>` becomes the site identifier in lowercase with hyphens — `LMC_NORTH` → `lmc-north`.
+
+#### Single-site (legacy fallback)
+
 | Variable | Required | Description |
 |---|---|---|
-| `CIVICRM_BASE_URL` | Yes | Base URL of your CiviCRM site (e.g., `https://example.org`) |
+| `CIVICRM_BASE_URL` | Yes | Base URL of your CiviCRM site |
 | `CIVICRM_API_KEY` | Yes | Your CiviCRM API key |
-| `TRANSPORT` | No | `stdio` (default) or `http` |
-| `PORT` | No | HTTP port when using `http` transport (default: `3000`) |
+
+#### Other
+
+| Variable | Default | Description |
+|---|---|---|
+| `TRANSPORT` | `stdio` | `stdio` or `http` |
+| `PORT` | `3000` | HTTP port (when using `http` transport) |
 
 ### Getting Your API Key
 
@@ -74,7 +95,7 @@ npm install
 npm run build
 ```
 
-### Run (stdio)
+### Run (stdio, single site)
 
 ```bash
 export CIVICRM_BASE_URL="https://your-civicrm-site.org"
@@ -82,11 +103,22 @@ export CIVICRM_API_KEY="your-api-key"
 node dist/index.js
 ```
 
+### Run (stdio, multi-site)
+
+```bash
+export CIVICRM_SITE_WESSEX_URL="https://wessex.example.org"
+export CIVICRM_SITE_WESSEX_KEY="key-for-wessex"
+export CIVICRM_SITE_LMC_NORTH_URL="https://lmc-north.example.org"
+export CIVICRM_SITE_LMC_NORTH_KEY="key-for-lmc-north"
+node dist/index.js
+# Then use: civicrm_use_site("wessex") or civicrm_use_site("lmc-north")
+```
+
 ### Run (HTTP)
 
 ```bash
-export CIVICRM_BASE_URL="https://your-civicrm-site.org"
-export CIVICRM_API_KEY="your-api-key"
+export CIVICRM_SITE_WESSEX_URL="https://wessex.example.org"
+export CIVICRM_SITE_WESSEX_KEY="key-for-wessex"
 export TRANSPORT=http
 export PORT=3000
 node dist/index.js
@@ -95,6 +127,8 @@ node dist/index.js
 ## Claude Desktop Configuration
 
 Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+### Single site
 
 ```json
 {
@@ -111,9 +145,34 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 }
 ```
 
+### Multiple sites
+
+```json
+{
+  "mcpServers": {
+    "civicrm": {
+      "command": "node",
+      "args": ["/path/to/civicrm-MCP/dist/index.js"],
+      "env": {
+        "CIVICRM_SITE_WESSEX_URL": "https://wessex.example.org",
+        "CIVICRM_SITE_WESSEX_KEY": "key-for-wessex",
+        "CIVICRM_SITE_LMC_NORTH_URL": "https://lmc-north.example.org",
+        "CIVICRM_SITE_LMC_NORTH_KEY": "key-for-lmc-north"
+      }
+    }
+  }
+}
+```
+
+Then at the start of a conversation, tell the agent which site to use:
+
+> "Use the wessex site"
+> "Switch to lmc-north and find all contributions from last month"
+> "What CiviCRM sites are available?"
+
 ## API Notes
 
 - Uses **CiviCRM APIv4** exclusively (not the deprecated APIv3)
-- All requests go to `{CIVICRM_BASE_URL}/civicrm/ajax/api4/{Entity}/{action}`
+- All requests go to `{baseUrl}/civicrm/ajax/api4/{Entity}/{action}`
 - Auth uses `X-Civi-Auth: Bearer {API_KEY}` header
-- WordPress installs need the full verbose URL; set `CIVICRM_BASE_URL` to `https://wordpress.example.org/wp-admin/admin.php?page=CiviCRM&q=`
+- WordPress installs need the full verbose URL — set the site URL to `https://wordpress.example.org/wp-admin/admin.php?page=CiviCRM&q=`
