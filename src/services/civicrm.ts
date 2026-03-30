@@ -2,18 +2,102 @@ import axios, { AxiosError } from 'axios';
 import { CHARACTER_LIMIT } from '../constants.js';
 import { ApiCallParams, CiviCRMApiResponse } from '../types.js';
 
+// ── Site registry ────────────────────────────────────────────────────────────
+
+interface SiteConfig {
+  url: string;
+  key: string;
+}
+
+/** All sites discovered at startup from env vars. */
+const siteRegistry = new Map<string, SiteConfig>();
+
+/** Currently active site for this process session. */
+let activeSite: (SiteConfig & { slug: string }) | null = null;
+
+/**
+ * Convert a user-provided slug to the env var prefix.
+ * "lmc-north" → "LMC_NORTH"
+ */
+function slugToEnvPrefix(slug: string): string {
+  return slug.toUpperCase().replace(/-/g, '_');
+}
+
+/**
+ * Scan process.env at startup for all CIVICRM_SITE_<SLUG>_URL entries.
+ * Pairs each with its corresponding CIVICRM_SITE_<SLUG>_KEY.
+ * Falls back to legacy CIVICRM_BASE_URL / CIVICRM_API_KEY if no sites found.
+ */
+export function loadSiteRegistry(): void {
+  const urlPattern = /^CIVICRM_SITE_(.+)_URL$/;
+
+  for (const [key, value] of Object.entries(process.env)) {
+    const match = urlPattern.exec(key);
+    if (!match || !value) continue;
+
+    const prefix = match[1]; // e.g. "WESSEX" or "LMC_NORTH"
+    const apiKey = process.env[`CIVICRM_SITE_${prefix}_KEY`];
+
+    if (!apiKey) {
+      console.error(`WARN: CIVICRM_SITE_${prefix}_URL is set but CIVICRM_SITE_${prefix}_KEY is missing — skipping`);
+      continue;
+    }
+
+    // Store under lowercase hyphenated slug for user-facing display
+    const slug = prefix.toLowerCase().replace(/_/g, '-');
+    siteRegistry.set(slug, { url: value.replace(/\/$/, ''), key: apiKey });
+  }
+
+  // Legacy single-site fallback
+  if (siteRegistry.size === 0) {
+    const url = process.env.CIVICRM_BASE_URL;
+    const key = process.env.CIVICRM_API_KEY;
+    if (url && key) {
+      siteRegistry.set('default', { url: url.replace(/\/$/, ''), key });
+      activeSite = { slug: 'default', url: url.replace(/\/$/, ''), key };
+      console.error('INFO: Using legacy CIVICRM_BASE_URL / CIVICRM_API_KEY as "default" site');
+    }
+  }
+
+  if (siteRegistry.size === 0) {
+    console.error('ERROR: No CiviCRM sites configured. Add CIVICRM_SITE_<SLUG>_URL and CIVICRM_SITE_<SLUG>_KEY env vars.');
+    process.exit(1);
+  }
+
+  console.error(`INFO: ${siteRegistry.size} site(s) loaded: ${[...siteRegistry.keys()].join(', ')}`);
+}
+
+/** Return sorted list of available site slugs. */
+export function getAvailableSites(): string[] {
+  return [...siteRegistry.keys()].sort();
+}
+
+/**
+ * Set the active site by slug. Returns the site config on success,
+ * or throws with a helpful message listing valid slugs.
+ */
+export function selectSite(slug: string): SiteConfig & { slug: string } {
+  const normalised = slug.toLowerCase().trim();
+  const site = siteRegistry.get(normalised);
+
+  if (!site) {
+    const available = getAvailableSites().join(', ');
+    throw new Error(`Unknown site "${slug}". Available sites: ${available}`);
+  }
+
+  activeSite = { slug: normalised, ...site };
+  return activeSite;
+}
+
+/** Return the currently active site or throw asking user to select one. */
 function getConfig(): { baseUrl: string; apiKey: string } {
-  const baseUrl = process.env.CIVICRM_BASE_URL?.replace(/\/$/, '');
-  const apiKey = process.env.CIVICRM_API_KEY;
-
-  if (!baseUrl) {
-    throw new Error('CIVICRM_BASE_URL environment variable is required');
+  if (!activeSite) {
+    const available = getAvailableSites().join(', ');
+    throw new Error(
+      `No site selected. Call civicrm_use_site first.\nAvailable sites: ${available}`
+    );
   }
-  if (!apiKey) {
-    throw new Error('CIVICRM_API_KEY environment variable is required');
-  }
-
-  return { baseUrl, apiKey };
+  return { baseUrl: activeSite.url, apiKey: activeSite.key };
 }
 
 /**
