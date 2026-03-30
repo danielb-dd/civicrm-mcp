@@ -1,0 +1,51 @@
+<evaluation>
+  <qa_pair>
+    <question>Using the civicrm_get_entity_fields tool, how many non-deprecated fields does the Contact entity have? Call getFields with entity="Contact" and count the entries in the returned fields array.</question>
+    <answer>Use civicrm_get_entity_fields with entity="Contact" and count the values returned in the fields array.</answer>
+  </qa_pair>
+
+  <qa_pair>
+    <question>What actions are available for the Contribution entity in CiviCRM? List all action names returned by civicrm_get_entity_actions for entity="Contribution".</question>
+    <answer>Use civicrm_get_entity_actions with entity="Contribution" to retrieve and list all available action names.</answer>
+  </qa_pair>
+
+  <qa_pair>
+    <question>Using civicrm_api with entity="OptionGroup" and action="get", what option groups exist in CiviCRM? List the names of all returned option groups.</question>
+    <answer>Use civicrm_api with entity="OptionGroup", action="get" to retrieve and list all option group names from the values array.</answer>
+  </qa_pair>
+
+  <qa_pair>
+    <question>What activity types are configured in this CiviCRM instance? Use civicrm_api with entity="OptionValue", action="get", and filter where option_group_id:name = "activity_type". List the labels of all activity types returned.</question>
+    <answer>Use civicrm_api with entity="OptionValue", action="get", params={"where": [["option_group_id:name", "=", "activity_type"]], "select": ["label", "value", "name"]} to retrieve and list all activity type labels.</answer>
+  </qa_pair>
+
+  <qa_pair>
+    <question>How many active contacts of type "Individual" exist in CiviCRM? Use civicrm_get_contacts with contact_type="Individual" and response_format="json", then report the total count from the pagination metadata.</question>
+    <answer>Use civicrm_get_contacts with contact_type="Individual", response_format="json", limit=1 to get the total count from the pagination metadata (the "total" field, or count matched).</answer>
+  </qa_pair>
+
+  <qa_pair>
+    <question>What membership types are available in this CiviCRM instance? Use civicrm_api with entity="MembershipType" and action="get" to list all membership types and their minimum fee amounts.</question>
+    <answer>Use civicrm_api with entity="MembershipType", action="get", params={"select": ["name", "minimum_fee", "duration_unit", "duration_interval", "is_active"]} to retrieve all membership types and their fees.</answer>
+  </qa_pair>
+
+  <qa_pair>
+    <question>What event types are configured in CiviCRM? Use civicrm_api with entity="OptionValue", action="get", filtering where option_group_id:name = "event_type". List all event type labels.</question>
+    <answer>Use civicrm_api with entity="OptionValue", action="get", params={"where": [["option_group_id:name", "=", "event_type"]], "select": ["label", "value"]} to retrieve and list all event type labels.</answer>
+  </qa_pair>
+
+  <qa_pair>
+    <question>What financial types are available in this CiviCRM instance? Use civicrm_api with entity="FinancialType" and action="get" to list all active financial types by name.</question>
+    <answer>Use civicrm_api with entity="FinancialType", action="get", params={"where": [["is_active", "=", true]], "select": ["name", "description", "is_deductible"]} to list all active financial types.</answer>
+  </qa_pair>
+
+  <qa_pair>
+    <question>What relationship types are defined in this CiviCRM instance? Use civicrm_api with entity="RelationshipType" and action="get" to list all relationship types including their label_a_b and label_b_a fields.</question>
+    <answer>Use civicrm_api with entity="RelationshipType", action="get", params={"select": ["label_a_b", "label_b_a", "contact_type_a", "contact_type_b", "is_active"]} to list all relationship types.</answer>
+  </qa_pair>
+
+  <qa_pair>
+    <question>What contribution statuses are available in CiviCRM? Use civicrm_api with entity="OptionValue", action="get", filtering where option_group_id:name = "contribution_status". List all status labels and their numeric values.</question>
+    <answer>Use civicrm_api with entity="OptionValue", action="get", params={"where": [["option_group_id:name", "=", "contribution_status"]], "select": ["label", "value", "name"]} to retrieve all contribution status options with their labels and values.</answer>
+  </qa_pair>
+</evaluation>

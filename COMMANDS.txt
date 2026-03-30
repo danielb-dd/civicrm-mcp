@@ -1,0 +1,293 @@
+================================================================================
+CIVICRM MCP — USEFUL COMMANDS & SEARCHES
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+CONTACTS
+────────────────────────────────────────────────────────────────────────────────
+
+Find contacts by last name:
+  Find all contacts with last name "Smith"
+
+Find by organisation name:
+  Find all organisations called "Wessex"
+
+Find by email:
+  Find all contacts with a gmail.com email address
+
+Find a specific contact and show full details:
+  Show full details for contact ID 42
+
+Find contacts of a specific type:
+  List all Individual contacts
+  List all Organisation contacts
+  List all Household contacts
+
+Create a new individual:
+  Create a contact: first name "Jane", last name "Doe", email "jane@example.com", contact type Individual
+
+Create a new organisation:
+  Create an organisation called "Wessex Medical Practice"
+
+Update a contact:
+  Update contact 42 — set job title to "Practice Manager"
+  Update contact 100 — set do_not_email to true
+
+Delete (soft) a contact:
+  Move contact 99 to trash
+
+Search and paginate:
+  Show me the first 25 Individual contacts
+  Show me the next 25 Individual contacts (offset 25)
+
+
+────────────────────────────────────────────────────────────────────────────────
+ACTIVITIES
+────────────────────────────────────────────────────────────────────────────────
+
+List recent activities:
+  Show me the last 25 activities
+
+Filter by type:
+  Show all Phone Call activities
+  Show all Email activities
+  Show all Meeting activities
+
+Filter by status:
+  Show all Scheduled activities
+  Show all Completed activities
+
+Filter by contact:
+  Show all activities for contact ID 42
+
+Filter by date:
+  Show all activities from the last 7 days
+  Show all activities between 2026-01-01 and 2026-03-31
+
+Log a new activity:
+  Log a Phone Call with contact 42, subject "Follow-up call", status Completed
+  Log a Meeting with contact 100, subject "Annual review", date 2026-04-01, status Scheduled
+
+Update an activity:
+  Mark activity 55 as Completed
+  Update activity 55 — set details to "Discussed renewal options"
+
+
+────────────────────────────────────────────────────────────────────────────────
+CONTRIBUTIONS / DONATIONS
+────────────────────────────────────────────────────────────────────────────────
+
+List recent contributions:
+  Show me the last 25 contributions
+
+Filter by contact:
+  Show all contributions for contact ID 42
+
+Filter by status:
+  Show all Completed contributions
+  Show all Pending contributions
+  Show all Failed contributions
+
+Filter by amount:
+  Show all contributions over £500
+  Show all contributions between £100 and £500
+
+Filter by date:
+  Show all contributions received this month
+  Show all contributions received in 2025
+
+Filter by financial type:
+  Show all Donation contributions
+  Show all Member Dues contributions
+
+Record a new contribution:
+  Record a £150 donation for contact 42, financial type "Donation", status Completed
+
+Summary / totals:
+  How much has contact 42 donated in total?
+  Show me all contributions this year and sum the total
+
+
+────────────────────────────────────────────────────────────────────────────────
+EVENTS & PARTICIPANTS
+────────────────────────────────────────────────────────────────────────────────
+
+List events:
+  Show me all upcoming events
+  List all active events
+  List all events of type "Training"
+
+Find a specific event:
+  Find events with "Vitamin B12" in the title
+  Find events starting in April 2026
+
+Get participants for an event:
+  Show participants for event ID 903
+  Show all Registered participants for event ID 903
+  Show all Attended participants for event ID 903
+  How many people are registered for event ID 903?
+
+Check a contact's event history:
+  Show all events contact 42 has registered for
+
+Register a participant:
+  Register contact 42 for event 903
+  Register contact 42 for event 903 with status "Attended" and fee £50
+
+Create an event:
+  Create an event called "Spring Conference", type "Conference", start date 2026-05-01
+
+
+────────────────────────────────────────────────────────────────────────────────
+MEMBERSHIPS
+────────────────────────────────────────────────────────────────────────────────
+
+List memberships:
+  Show me all Current memberships
+  Show me all Expired memberships
+  Show me all Grace memberships
+
+Filter by contact:
+  Show all memberships for contact 42
+
+Filter by type:
+  Show all "General" memberships
+  Show all "GP Trainer" memberships
+
+Find expiring soon:
+  Show all memberships expiring before 2026-06-01
+
+Create a membership:
+  Create a General membership for contact 42 starting 2026-01-01, ending 2026-12-31
+
+
+────────────────────────────────────────────────────────────────────────────────
+GROUPS
+────────────────────────────────────────────────────────────────────────────────
+
+List all groups:
+  Show me all groups in CiviCRM
+  Show me all active mailing list groups
+
+Get group members:
+  List all members of group ID 5
+  Show me who is in group "Newsletter Subscribers"
+
+Add/remove from group:
+  Add contact 42 to group 5
+  Remove contact 42 from group 5
+
+
+────────────────────────────────────────────────────────────────────────────────
+RELATIONSHIPS
+────────────────────────────────────────────────────────────────────────────────
+
+Find relationships:
+  Show all relationships for contact 42
+  Show all active "Employee of" relationships
+  Who is employed by organisation 10?
+
+Create a relationship:
+  Link contact 42 as "Employee of" organisation 100
+
+
+────────────────────────────────────────────────────────────────────────────────
+CASES (CiviCase)
+────────────────────────────────────────────────────────────────────────────────
+
+List cases:
+  Show all Open cases
+  Show all cases for contact 42
+  Show all Urgent cases
+
+Create a case:
+  Create an Open case for contact 42, subject "Training query", type "General"
+
+
+────────────────────────────────────────────────────────────────────────────────
+DISCOVERY & METADATA (useful for exploring your CiviCRM setup)
+────────────────────────────────────────────────────────────────────────────────
+
+See what fields exist on an entity:
+  What fields are available on the Contact entity?
+  What fields are available on the Contribution entity?
+  Show me all custom fields on the Contact entity (use include_custom=true)
+
+See what actions are available:
+  What actions are available for the Event entity?
+  What actions are available for the Membership entity?
+
+Explore option values (pick lists):
+  What activity types are configured?
+    → civicrm_api entity="OptionValue" action="get"
+      params: {"where": [["option_group_id:name", "=", "activity_type"]], "select": ["label","value"]}
+
+  What contribution statuses exist?
+    → civicrm_api entity="OptionValue" action="get"
+      params: {"where": [["option_group_id:name", "=", "contribution_status"]], "select": ["label","value"]}
+
+  What event types are configured?
+    → civicrm_api entity="OptionValue" action="get"
+      params: {"where": [["option_group_id:name", "=", "event_type"]], "select": ["label","value"]}
+
+  What participant statuses exist?
+    → civicrm_api entity="OptionValue" action="get"
+      params: {"where": [["option_group_id:name", "=", "participant_status"]], "select": ["label","value"]}
+
+  What membership statuses exist?
+    → civicrm_api entity="OptionValue" action="get"
+      params: {"where": [["option_group_id:name", "=", "membership_status"]], "select": ["label","value"]}
+
+  What relationship types exist?
+    → civicrm_api entity="RelationshipType" action="get"
+      params: {"select": ["label_a_b", "label_b_a", "is_active"]}
+
+  What membership types exist?
+    → civicrm_api entity="MembershipType" action="get"
+      params: {"select": ["name", "minimum_fee", "duration_unit", "is_active"]}
+
+  What financial types exist?
+    → civicrm_api entity="FinancialType" action="get"
+      params: {"where": [["is_active", "=", true]], "select": ["name", "is_deductible"]}
+
+  What case types exist?
+    → civicrm_api entity="CaseType" action="get"
+      params: {"select": ["name", "title", "is_active"]}
+
+  What tags exist?
+    → civicrm_api entity="Tag" action="get"
+      params: {"select": ["name", "description", "used_for"]}
+
+  What custom field groups exist?
+    → civicrm_api entity="CustomGroup" action="get"
+      params: {"select": ["name", "title", "extends", "is_active"]}
+
+
+────────────────────────────────────────────────────────────────────────────────
+MULTI-STEP WORKFLOWS (chain these in one message)
+────────────────────────────────────────────────────────────────────────────────
+
+Onboard a new contact:
+  "Create a new individual called John Smith, email john@example.com,
+   then log a Phone Call activity with him today subject 'Initial enquiry',
+   and add him to group 5"
+
+Record a training attendance:
+  "Find contact Jane Doe, register her for event 903 with status Attended,
+   and log a Completed activity of type Meeting subject 'B12 Training attended'"
+
+Contribution + note:
+  "Record a £200 donation for contact 42, financial type Donation,
+   and log an activity of type Email subject 'Donation acknowledgement sent'"
+
+
+================================================================================
+TIPS
+================================================================================
+
+- response_format="json" gives raw data useful for cross-referencing IDs
+- response_format="markdown" (default) gives readable summaries
+- Always use last_name= to find contacts by surname (more precise than search=)
+- Use civicrm_api for anything not covered by the specialist tools
+- IDs can be passed as numbers or strings — both are accepted
+================================================================================
